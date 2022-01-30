@@ -1,0 +1,182 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DailyNews</title>
+    <link rel="icon" href="https://www.pngitem.com/pimgs/m/161-1615306_earth-news-logo-hd-png-download.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital@1&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+                <h4>DailyNews</h4>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/"><i class ="material-icons">home</i></a></li>
+            <li><a href="?search=top">Top news</a> </li>
+            <li><a href="?search=Business">Buisness</a></li>
+            <li><a href="?search=Entertainment">Entertainement</a></li>
+            <li><a href="?search=Technology">Technology</a></li>
+            <li><a href="?search=Health">Health</a></li>
+            <li><a href="?search=Science">Science</a></li>
+            <li><a href="?search=Sports">Sports</a></li>
+        </ul>
+
+    </nav>
+
+    <div class="container" id="articles-container">
+        {% for value in data %}
+        <div class="card mb-3 box" style="width: 1500px ;height:200px; margin:auto;">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="{{value.url}}" target="_blanck" style="color:#000000"><b>{{value.title}}</b></a></h5>
+                        <p class="card-text" style="font-size:20px">{{value.description}}</p>
+                        <p class="card-text" style="font-family:cursive"><small class="text-muted">{{value.publishedAt}}</small></p>
+                    </div>
+                </div>
+
+                <div class="col-md-4 img-box">
+                    <img src="{{value.image}}" class="card-img" alt="..." height="100%">
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <h1 id="loading">Loading....</h1>
+</body>
+
+<script>
+$(document).ready(function() {
+    console.log( "ready!" );
+    el = document.getElementsByClassName("text-muted")
+    for (i = 0; i < el.length; i++) {
+        t = document.getElementsByClassName("text-muted")[i].innerText
+        var d = new Date(t)
+        document.getElementsByClassName("text-muted")[i].innerText = d.toDateString()
+    }
+});
+var page = 2;
+var window_scroll = true;
+var search = "{{ search }}";
+
+window.addEventListener('scroll', function(e) {
+    // scroll check
+    console.log("scroll check...")
+    if(window_scroll){
+        if((window.innerHeight + window.scrollY) >= (document.body.scrollHeight-200)){
+            window_scroll = false;
+            document.getElementById("loading").style.display = "block";
+            $.ajax({
+                url: '/next?page=' + page + '&search=' + search,
+                dataType: 'json',
+                success: function (data) {
+                    if (data["success"]) {
+                        articles = data["data"]
+                        articles_html = ''
+                        for (i = 0; i < articles.length; i++) {
+                            articles_html += ' \
+                            <div class="card mb-3 box" style="width: 1500px; height:200px; margin:auto;">\
+                                <div class="row">\
+                                    <div class="col-md-8">\
+                                        <div class="card-body">\
+                                            <h5 class="card-title"><a href="'+ articles[i]["url"] +'" target="_blanck" style="color:#000000">'+ articles[i]["title"] +'</a></h5>\
+                                            <p class="card-text">'+ articles[i]["description"] +'</p>\
+                                            <p class="card-text"><small class="text-muted">'+ articles[i]["publishedAt"] +'</small></p>\
+                                        </div>\
+                                    </div>\
+                                            \
+                                    <div class="col-md-4 img-box" >\
+                                        <img src="'+ articles[i]["image"] +'" class="card-img" alt="..." height="100%">\
+                                    </div>\
+                                </div>\
+                            </div>\
+                            '
+                        }
+                        $("#articles-container").append(articles_html);
+                        page += 1
+                        window_scroll = true;
+                        document.getElementById("loading").style.display = "none";
+                    }
+                    else {
+                        console.log("Failed")
+                        window_scroll = true;
+                        document.getElementById("loading").style.display = "none";
+                    }
+                }
+            });
+        }
+    }
+})
+</script>
+
+<style>
+*{
+ margin:0px;
+ padding:0px;
+ box-sizing: border-box;
+}
+nav{
+ display:flex;
+ justify-content: space-around;
+ align-items:center;
+ background-color:black;
+ overflow:hidden;
+}
+nav li {
+  display: inline;
+  align-text: center;
+  font-family: 'Bodoni Moda', serif;
+}
+.logo{
+ font-family: 'Bodoni Moda', serif;
+ font-size:15px;
+ color:white;
+ display: inline;
+}
+.nav-links{
+    display:flex;
+    justify-content: space-around;
+    float:left;
+    text-align:center;
+    padding: 6px 9px;
+}
+.nav-links a{
+  text-decoration:none;
+  letter-spacing:5px;
+  font-weight:bold;
+  margin-right:50px;
+}
+.nav-links li{
+  list-style:none;
+}
+
+.nav-links li i{
+   font-weight:bold;
+}
+ .nav-links a{
+    color:white;
+    letter-spacing:1px;
+    font-size:20px;
+   }
+
+.nav-links{
+  opacity: 0px;
+
+.container{
+ width:60px;
+}
+
+
+</style>
+
+</html>
+

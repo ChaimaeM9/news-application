@@ -1,0 +1,28 @@
+#articles-container{
+    margin-left: 0px;
+}
+.box{
+    transition-property: box-shadow, transform;
+    transition-duration: 1s;
+}
+.box:hover{
+    /* box-shadow: 2px 2px 5px #8080807a; */
+    box-shadow: 1px 2px 8px 0px #00bcffb0;
+    transform: translateY(-9px);
+}
+.img-box{
+    padding:3px;
+    width:50%;
+    length:50%;
+}
+.img-box img{
+    border-radius:5px;
+    object-fit:cover;
+    height:190px;
+}
+#loading{
+    text-align: center;
+    display: none;
+}
+
+
